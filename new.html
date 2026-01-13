@@ -1,0 +1,1086 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>THE IRON WARRIORS - Powerlifting Championship 2026</title>
+
+    <!-- Use compat (UMD) builds so existing firebase.* API works (no module/import errors) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+
+    <!-- FingerprintJS UMD -->
+    <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
+
+    <style>
+        /* ========== UI STYLES (your provided theme) ========== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --primary: #d4af37; --dark: #1a1a1a; --dark-light: #2d2d2d; --accent: #c41e3a; --light: #f5f5f5; --text: #ffffff; --border: #333; --success: #90ee90; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 50%, var(--dark) 100%); color: var(--text); line-height: 1.6; position: relative; overflow-x: hidden; }
+        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 20% 50%, rgba(196, 30, 58, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.03) 0%, transparent 50%); pointer-events: none; z-index: -1; }
+
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-30px); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+        @keyframes glow { 0%, 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.3), inset 0 1px 0 rgba(255,255,255,0.1); } 50% { box-shadow: 0 0 40px rgba(212, 175, 55, 0.5), inset 0 1px 0 rgba(255,255,255,0.15); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes confetti { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(-500px) rotate(720deg); opacity: 0; } }
+        @keyframes swing { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+        @keyframes scaleIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .header { background: linear-gradient(135deg, var(--dark) 0%, var(--accent) 100%); padding: 40px 20px; text-align: center; border-bottom: 4px solid var(--primary); position: relative; overflow: hidden; animation: slideIn 0.8s ease; }
+        .header::before { content: '💪'; position: absolute; font-size: 100px; opacity: 0.08; right: -20px; top: -20px; animation: float 4s ease-in-out infinite; }
+        .header::after { content: '🏆'; position: absolute; font-size: 100px; opacity: 0.08; left: -20px; bottom: -20px; animation: float 4s ease-in-out infinite 0.7s; }
+        .header h1 { font-size: 2.8em; font-weight: 900; margin: 10px 0; color: var(--primary); text-shadow: 3px 3px 8px rgba(0,0,0,0.7), 0 0 20px rgba(212, 175, 55, 0.3); letter-spacing: 2px; animation: pulse 3s ease-in-out infinite; }
+        .header p { font-size: 1em; color: var(--text); margin: 8px 0; font-weight: 500; }
+
+        .event-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 25px; padding: 20px; background: rgba(255,255,255,0.08); border-radius: 15px; backdrop-filter: blur(15px); border: 2px solid rgba(212, 175, 55, 0.2); }
+        .detail-box { text-align: center; padding: 15px; background: rgba(212, 175, 55, 0.12); border-left: 4px solid var(--primary); border-radius: 10px; transition: all 0.3s ease; }
+        .detail-box:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); }
+        .detail-box h4 { color: var(--primary); font-size: 0.85em; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+        .detail-box p { font-size: 0.9em; color: rgba(255,255,255,0.9); }
+
+        .container { max-width: 900px; margin: 30px auto; padding: 30px 20px; background: rgba(255,255,255,0.05); border-radius: 20px; border: 2px solid var(--primary); box-shadow: 0 25px 70px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1); backdrop-filter: blur(12px); animation: fadeIn 0.8s ease 0.2s both; }
+        .form-section { margin-bottom: 35px; }
+        .section-title { font-size: 1.4em; color: var(--primary); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 3px solid var(--accent); font-weight: 700; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .form-group { display: flex; flex-direction: column; }
+        label { margin-bottom: 8px; font-weight: 700; color: var(--primary); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select, textarea { padding: 12px 15px; border: 2px solid var(--border); background: rgba(255,255,255,0.06); color: var(--text); border-radius: 8px; font-size: 0.95em; transition: all 0.35s ease; font-family: inherit; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); background: rgba(255,255,255,0.12); box-shadow: 0 0 25px rgba(212, 175, 55, 0.4), inset 0 2px 8px rgba(212, 175, 55, 0.1); transform: translateY(-2px); }
+        input::placeholder { color: rgba(255,255,255,0.45); }
+
+        .checkbox-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 12px; }
+        .checkbox-item { display: flex; align-items: center; gap: 10px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 8px; border: 2px solid transparent; transition: all 0.35s ease; cursor: pointer; }
+        .checkbox-item:hover { border-color: var(--primary); background: rgba(212, 175, 55, 0.15); transform: translateX(3px); }
+        .checkbox-item input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-color: var(--primary); }
+
+        .error-message { color: #ff6b6b; font-size: 0.8em; margin-top: 5px; display: none; font-weight: 600; }
+        .error-message.show { display: block; animation: slideIn 0.3s ease; }
+        input.error, select.error, textarea.error { border-color: #ff6b6b !important; background: rgba(255, 107, 107, 0.1) !important; }
+
+        .price-section { background: linear-gradient(135deg, rgba(196, 30, 58, 0.2), rgba(212, 175, 55, 0.2)); padding: 30px; border-radius: 15px; border: 2px solid var(--primary); margin: 25px 0; text-align: center; animation: glow 2.5s ease-in-out infinite; }
+        .price-display { font-size: 3em; font-weight: 900; color: var(--primary); margin: 12px 0; text-shadow: 0 0 20px rgba(212, 175, 55, 0.5); animation: pulse 2s ease-in-out infinite; }
+
+        .payment-section { display: none; margin-top: 25px; }
+        .payment-section.show { display: block; }
+        .payment-box { background: #111; border: 1px solid #333; border-radius: 10px; padding: 18px; color: #fff; }
+        .payment-box p { margin: 6px 0; }
+
+        .upi-info-box { background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(196, 30, 58, 0.2)); border: 3px solid var(--primary); padding: 25px; border-radius: 15px; margin: 20px 0; text-align: center; }
+        .upi-info-box h3 { color: var(--primary); font-size: 1.4em; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .upi-detail { background: rgba(255,255,255,0.08); padding: 15px; margin: 12px 0; border-radius: 10px; border-left: 4px solid var(--primary); text-align: left; }
+        .upi-detail label { display: block; margin-bottom: 6px; font-size: 0.8em; }
+        .upi-detail .value { font-size: 1.2em; font-weight: 700; color: var(--primary); font-family: 'Courier New', monospace; }
+
+        .file-upload-box { background: rgba(212, 175, 55, 0.08); padding: 25px; border-radius: 15px; border: 3px dashed var(--primary); margin: 20px 0; text-align: center; transition: all 0.3s ease; }
+        .file-upload-box:hover { background: rgba(212, 175, 55, 0.15); box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); }
+        .file-upload-box label { display: block; margin-bottom: 12px; font-size: 1em; }
+        .file-upload-box input[type="file"] { display: none; }
+        .file-upload-label { display: inline-block; background: linear-gradient(135deg, var(--primary), #daa52d); color: var(--dark); padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.3s ease; border: none; }
+        .file-upload-label:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(212, 175, 55, 0.35); }
+        .file-name { margin-top: 10px; color: var(--success); font-size: 0.9em; font-weight: 600; }
+
+        .button-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; margin-top: 30px; }
+        button { padding: 14px 28px; font-size: 1em; font-weight: 900; border: none; border-radius: 8px; cursor: pointer; transition: all 0.35s ease; text-transform: uppercase; letter-spacing: 1px; position: relative; overflow: hidden; }
+        button::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255,255,255,0.25); border-radius: 50%; transform: translate(-50%, -50%); transition: width 0.6s, height 0.6s; }
+        button:hover::before { width: 300px; height: 300px; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), #daa52d); color: var(--dark); box-shadow: 0 12px 40px rgba(212, 175, 55, 0.35); }
+        .btn-primary:hover { transform: translateY(-4px); box-shadow: 0 18px 50px rgba(212, 175, 55, 0.5); }
+        .btn-secondary { background: linear-gradient(135deg, var(--accent), #a01630); color: var(--text); box-shadow: 0 12px 40px rgba(196, 30, 58, 0.35); }
+        .btn-secondary:hover { transform: translateY(-4px); box-shadow: 0 18px 50px rgba(196, 30, 58, 0.5); }
+
+        /* Success popup */
+        .success-popup-overlay { display: none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.7); z-index:2000; animation: fadeIn 0.3s ease; justify-content: center; align-items: center; }
+        .success-popup-overlay.show { display:flex; }
+        .success-popup-content { background: var(--dark-light); border: 3px solid var(--success); border-radius:20px; padding:50px 40px; max-width:450px; width:90%; animation: scaleIn 0.4s ease; box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 40px rgba(144, 238, 144, 0.3); text-align:center; }
+        .success-popup-icon { font-size:6em; animation: bounce 0.8s ease-in-out infinite; margin-bottom: 20px; }
+        .success-popup-content h2 { color: var(--success); font-size:2.2em; margin:20px 0; animation: pulse 2s ease-in-out infinite; }
+
+        .success-message { background: rgba(144, 238, 144, 0.12); border: 3px solid var(--success); padding:35px 20px; border-radius:15px; text-align:center; display:none; animation: slideIn 0.5s ease; }
+        .success-message.show { display:block; }
+
+        .trophy-animation { font-size:5em; animation: bounce 0.8s ease-in-out infinite; margin-bottom:15px; }
+        .confetti-piece { position: fixed; pointer-events: none; font-size: 1.8em; }
+
+        .participant-id { background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(196, 30, 58, 0.1)); border: 3px solid var(--primary); padding:25px; border-radius:10px; margin:20px 0; text-align:center; font-family:'Courier New', monospace; box-shadow: 0 10px 40px rgba(212, 175, 55, 0.2); }
+        .participant-id .label { color: var(--primary); font-size:0.85em; text-transform:uppercase; font-weight:700; letter-spacing:0.5px; }
+        .participant-id .id { font-size:2.2em; font-weight:900; color: var(--primary); margin: 10px 0; text-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
+
+        .footer { background: var(--dark); padding: 35px 20px; text-align:center; border-top:4px solid var(--primary); margin-top:50px; }
+        .footer p { margin: 8px 0; font-size:0.9em; }
+        .contact-info { display:flex; justify-content:center; gap:20px; flex-wrap:wrap; margin-top:15px; }
+        .contact-item { display:flex; align-items:center; gap:8px; }
+        .contact-item a { color: var(--primary); text-decoration:none; font-weight:600; }
+        .animated-icons { display:flex; justify-content:center; gap:25px; margin:15px 0; flex-wrap:wrap; }
+        .animated-icon { font-size:2.5em; animation: swing 2s ease-in-out infinite; }
+
+        /* toast */
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 3000; display:flex; flex-direction: column; gap:10px; pointer-events:none; }
+        .toast { background: rgba(30,30,30,0.95); border:2px solid var(--primary); border-radius:12px; padding:16px 20px; color: var(--text); font-weight:600; font-size:0.95em; max-width:350px; animation: slideIn 0.4s ease; box-shadow: 0 10px 40px rgba(0,0,0,0.5); pointer-events:auto; display:flex; align-items:center; gap:10px; }
+        .toast.success { border-color: var(--success); color: var(--success); }
+        .toast.error { border-color: #ff6b6b; color: #ff6b6b; }
+        .toast.info { border-color: var(--primary); color: var(--primary); }
+        .toast-icon { font-size:1.3em; flex-shrink:0; }
+        .toast-message { flex:1; }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size:2em; }
+            .container { margin:15px; padding:20px; }
+            .form-grid { grid-template-columns: 1fr; gap:15px; }
+            .checkbox-group { grid-template-columns: 1fr; }
+            .price-display { font-size:2.2em; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>⚡ THE IRON WARRIORS ⚡</h1>
+        <p>POWERLIFTING CHAMPIONSHIP 2026</p>
+        <p style="color: var(--primary); font-weight: bold; margin-top: 5px;">Powered by BBD Health & Nutrition</p>
+        
+        <div class="event-details">
+            <div class="detail-box">
+                <h4>📍 Location</h4>
+                <p>Muscular Monkey Gym<br>Nehru Nagar-Kotra<br>Bhopal 462003</p>
+            </div>
+            <div class="detail-box">
+                <h4>📞 Contact Us</h4>
+                <p><a href="tel:9876543210" style="color: var(--primary); text-decoration: none;">9876543210</a><br>
+                <a href="tel:1243567890" style="color: var(--primary); text-decoration: none;">1243567890</a></p>
+            </div>
+            <div class="detail-box">
+                <h4>🏋️ Event Type</h4>
+                <p>Elite Powerlifting<br>Competition</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <form id="registrationForm" autocomplete="off">
+            <!-- Personal Information Section -->
+            <div class="form-section">
+                <div class="section-title">🔥 Personal Information</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="fullName">Full Name *</label>
+                        <input type="text" id="fullName" required placeholder="Enter your full name">
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="emailID">Email ID *</label>
+                        <input type="email" id="emailID" required placeholder="your.email@example.com">
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Age *</label>
+                        <input type="number" id="age" required min="18" placeholder="Your age">
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="mobileNumber">Mobile Number *</label>
+                        <input type="tel" id="mobileNumber" required placeholder="10-digit mobile number">
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="whatsappNumber">WhatsApp Number *</label>
+                        <input type="tel" id="whatsappNumber" required placeholder="10-digit WhatsApp number">
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="partnerName">Partner Name (Optional)</label>
+                        <input type="text" id="partnerName" placeholder="If registering with a partner">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Education Section -->
+            <div class="form-section">
+                <div class="section-title">🎓 Education</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="education">Current Education Level *</label>
+                        <select id="education" required>
+                            <option value="">Select education level</option>
+                            <option value="high-school">High School</option>
+                            <option value="diploma">Diploma</option>
+                            <option value="bachelors">Bachelor's Degree</option>
+                            <option value="masters">Master's Degree</option>
+                            <option value="phd">PhD</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <span class="error-message"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Physical Information Section -->
+            <div class="form-section">
+                <div class="section-title">💪 Physical Information</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="height">Height (in feet) *</label>
+                        <input type="text" id="height" required placeholder="e.g., 5'10&quot;">
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="weight">Weight (in kg) *</label>
+                        <input type="number" id="weight" required placeholder="Your body weight">
+                        <span class="error-message"></span>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 12px;">
+                    <label for="address">Current Address *</label>
+                    <textarea id="address" required placeholder="Enter your complete address" style="resize: vertical; min-height: 70px;"></textarea>
+                    <span class="error-message"></span>
+                </div>
+            </div>
+
+            <!-- Sports Selection Section -->
+            <div class="form-section">
+                <div class="section-title">🏋️ Select Your Sports/Workouts *</div>
+                <p style="margin-bottom: 12px; color: rgba(255,255,255,0.8); font-size: 0.85em;">
+                    ⚠️ Deadlift requires minimum body weight of 50kg
+                </p>
+                <div class="checkbox-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="squatsCheckbox" name="sports" value="squats" class="sport-checkbox">
+                        <span>🦵 Squats</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="deadliftCheckbox" name="sports" value="deadlift" class="sport-checkbox">
+                        <span>🎯 Deadlift</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="chestpressCheckbox" name="sports" value="chestpress" class="sport-checkbox">
+                        <span>💥 Chest Press</span>
+                    </label>
+                </div>
+                <span class="error-message" id="sportsError"></span>
+            </div>
+
+            <!-- Referral Section -->
+            <div class="form-section">
+                <div class="section-title">🎯 Referral Code</div>
+                <div class="form-group">
+                    <label for="referralCode">Referral Code (Optional)</label>
+                    <input type="text" id="referralCode" placeholder="Enter referral code for discount">
+                    <p style="font-size: 0.8em; color: rgba(255,255,255,0.6); margin-top: 4px;">
+                        Valid codes: <strong>monkey gym</strong>, <strong>bbd dairy</strong>, <strong>bankey bihari</strong>
+                    </p>
+                    <p id="referralMessage" style="margin-top: 6px; font-size: 0.8em;"></p>
+                </div>
+            </div>
+
+            <!-- Price Section -->
+            <div class="price-section">
+                <p style="font-size: 0.85em; color: rgba(255,255,255,0.8);">Registration Fee</p>
+                <div class="price-display">₹<span id="priceDisplay">189</span></div>
+                <p id="priceNote" style="color: var(--primary); font-size: 0.85em;"></p>
+            </div>
+
+            <!-- PAYMENT DETAILS SECTION with Transaction ID and Account Holder Name -->
+            <div id="paymentSection" class="payment-section">
+                <h3 style="text-align:center;margin-bottom:15px;">💳 Payment Details</h3>
+
+                <div class="payment-box">
+                    <p><strong>Participant:</strong> <span id="paymentParticipantName">--</span></p>
+                    <p><strong>Amount:</strong> ₹<span id="paymentAmount">189</span></p>
+                    <hr>
+
+                    <p><strong>UPI ID:</strong> 9174486437@ybl</p>
+                    <p><strong>Account Holder:</strong> Vishnu Tiwari</p>
+                    <p><strong>Mobile Number:</strong> 9174486437</p>
+
+                    <p style="margin-top:10px;color:#ffcc00;">
+                        👉 Make payment using any UPI app manually and upload screenshot below.
+                    </p>
+
+                    <!-- Screenshot Upload -->
+                    <div class="file-upload-box">
+                        <label for="paymentScreenshot"><strong>Upload Payment Screenshot *</strong></label>
+                        <label class="file-upload-label" for="paymentScreenshot">Choose screenshot</label>
+                        <input type="file" id="paymentScreenshot" accept="image/*" required>
+                        <div class="file-name" id="fileName">No file chosen</div>
+                    </div>
+
+                    <!-- Transaction ID field -->
+                    <div class="form-group" style="margin-top:15px;">
+                        <label for="transactionID"><strong>Transaction ID *</strong></label>
+                        <input type="text" id="transactionID" required placeholder="Enter UPI transaction ID (e.g., 123456789012)">
+                        <span class="error-message"></span>
+                    </div>
+
+                    <!-- Account Holder Name field -->
+                    <div class="form-group" style="margin-top:15px;">
+                        <label for="accountHolderName"><strong>Account Holder Name *</strong></label>
+                        <input type="text" id="accountHolderName" required placeholder="Enter your account holder name">
+                        <span class="error-message"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success Message (inline) -->
+            <div class="success-message" id="successMessage">
+                <div class="trophy-animation">🏆</div>
+                <div class="animated-icons">
+                    <div class="animated-icon">💪</div>
+                    <div class="animated-icon">🔥</div>
+                    <div class="animated-icon">⚡</div>
+                </div>
+                <h2>Registration Successful! 🥇</h2>
+                <p style="margin: 15px 0; font-size: 1.05em;">Welcome to THE IRON WARRIORS!</p>
+                <p style="color: rgba(255,255,255,0.85); margin: 10px 0; font-size: 0.9em;">
+                    Check your WhatsApp for confirmation.<br>
+                    <strong>Get ready to lift heavy and become a WARRIOR! 💪🔥</strong>
+                </p>
+            </div>
+
+            <!-- Buttons -->
+            <div class="button-group" id="buttonGroup">
+                <button type="button" class="btn-secondary" onclick="resetForm()">Reset Form</button>
+                <button type="button" class="btn-primary" onclick="proceedToPayment()">Proceed to Payment</button>
+            </div>
+
+            <div class="button-group" id="paymentButtonGroup" style="display: none;">
+                <button type="button" class="btn-secondary" onclick="goBackToForm()">Back to Form</button>
+                <button type="button" class="btn-primary" id="submitBtn">Finalize Registration</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Success Popup Modal -->
+    <div id="successPopupOverlay" class="success-popup-overlay">
+        <div class="success-popup-content">
+            <div class="success-popup-icon">🎉</div>
+            <h2>Payment Received! ✅</h2>
+            <p>Your payment has been successfully recorded in our database.</p>
+            <p>A confirmation WhatsApp message has been sent to your number.</p>
+            
+            <div class="participant-id-display">
+                <label>Your Unique Participant ID:</label>
+                <div class="id" id="popupParticipantID">IW-2026-000000</div>
+            </div>
+
+            <p style="font-size: 0.9em; color: rgba(255,255,255,0.7);">
+                Save this ID for future reference and event day check-in.
+            </p>
+
+            <button type="button" class="success-popup-close" onclick="closeSuccessPopup()">Close</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <h3 style="color: var(--primary); margin-bottom: 12px; font-size: 1.3em;">🏋️ MUSCULAR MONKEY GYM 🏋️</h3>
+        <p><strong>THE IRON WARRIORS - Powerlifting Championship 2026</strong></p>
+        <p>Powered by BBD Health & Nutrition</p>
+        <p style="margin-top: 12px; color: var(--primary); font-size: 0.9em;">Nehru Nagar-Kotra, Bhopal 462003</p>
+        <div class="contact-info">
+            <div class="contact-item">
+                <span>📞</span>
+                <a href="tel:9876543210">9876543210</a>
+            </div>
+            <div class="contact-item">
+                <span>📞</span>
+                <a href="tel:1243567890">1243567890</a>
+            </div>
+        </div>
+        <p style="margin-top: 15px; font-size: 0.8em; color: rgba(255,255,255,0.6);">© 2026 THE IRON WARRIORS. All rights reserved.</p>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <script>
+        /* ========== Firebase config (update if needed) ========== */
+        const firebaseConfig = {
+            apiKey: "AIzaSyA-eh_d_faCoY7eWdnNCHh88anFvZbjBZA",
+            authDomain: "registration-form---bbd-event.firebaseapp.com",
+            databaseURL: "https://registration-form---bbd-event-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "registration-form---bbd-event",
+            // Confirm your storage bucket in Firebase Console. Commonly "<project-id>.appspot.com"
+            storageBucket: "registration-form---bbd-event.appspot.com",
+            messagingSenderId: "141575270320",
+            appId: "1:141575270320:web:e3e2c0a8b1bda4482d3075"
+        };
+
+        const WHATSAPP_NUMBER = '8965041460';
+        let userLocationData = null;
+        let deviceFingerprint = null;
+        let database = null;
+        let storage = null;
+
+        console.log('[v0] ========== FIREBASE INITIALIZATION ==========');
+        console.log('[v0] Initializing Firebase with config...');
+
+        try {
+            if (typeof firebase === 'undefined') {
+                throw new Error('Firebase SDK not loaded. Make sure compat scripts are included.');
+            }
+            // Initialize app once
+            if (!firebase.apps || firebase.apps.length === 0) {
+                firebase.initializeApp(firebaseConfig);
+            } else {
+                console.log('[v0] Firebase app already initialized');
+            }
+
+            database = firebase.database();
+            storage = firebase.storage();
+
+            console.log('[v0] ✅ Firebase database reference obtained');
+            console.log('[v0] Database URL:', firebaseConfig.databaseURL);
+            if (database) {
+                console.log('[v0] ✅ Database object verified - NOT NULL');
+            } else {
+                console.error('[v0] ❌ Database object is NULL after initialization');
+            }
+        } catch (error) {
+            console.error('[v0] ❌ Firebase initialization failed:', error.message);
+            console.error('[v0] Error stack:', error.stack);
+            console.error('[v0] Full error:', error);
+            showToast('Firebase initialization failed: ' + error.message, 'error');
+        }
+
+        /* Add toast notification system */
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer') || createToastContainer();
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️',
+                loading: '⏳',
+                location: '📍',
+                fingerprint: '🔐',
+                blob: '📷',
+                firebase: '🔥'
+            };
+
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type] || icons.info}</span>
+                <span class="toast-message">${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            if (type !== 'loading') {
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 400);
+                }, 3000);
+            }
+
+            return toast;
+        }
+
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+            return container;
+        }
+
+        const formElements = {
+            fullName: 'fullName',
+            emailID: 'emailID',
+            partnerName: 'partnerName',
+            education: 'education',
+            mobileNumber: 'mobileNumber',
+            whatsappNumber: 'whatsappNumber',
+            address: 'address',
+            age: 'age',
+            height: 'height',
+            weight: 'weight',
+            referralCode: 'referralCode',
+            priceDisplay: 'priceDisplay',
+            priceDescription: 'priceNote',
+            paymentParticipantName: 'paymentParticipantName',
+            paymentAmount: 'paymentAmount',
+            paymentScreenshot: 'paymentScreenshot',
+            transactionID: 'transactionID',
+            accountHolderName: 'accountHolderName',
+            fileNameDisplay: 'fileName',
+            buttonGroup: 'buttonGroup',
+            paymentButtonGroup: 'paymentButtonGroup',
+            successMessage: 'successMessage',
+            registrationForm: 'registrationForm',
+            sportsError: 'sportsError'
+        };
+
+        const DEADLIFT_MIN_WEIGHT = 50;
+        const STANDARD_PRICE = 189;
+        const DISCOUNTED_PRICE = 149;
+
+        function showError(element, message) {
+            element.classList.add('error');
+            const errorEl = element.parentElement.querySelector('.error-message');
+            if (errorEl) {
+                errorEl.textContent = message;
+                errorEl.classList.add('show');
+            }
+        }
+
+        function updatePriceAndDescription() {
+            const referralCodeInput = document.getElementById(formElements.referralCode);
+            const priceDisplay = document.getElementById(formElements.priceDisplay);
+            const priceDescription = document.getElementById(formElements.priceDescription);
+            const referralMessage = document.getElementById('referralMessage');
+
+            const referral = referralCodeInput.value.toLowerCase().trim();
+            const validCodes = ['monkey gym', 'bbd dairy', 'bankey bihari'];
+
+            let currentPrice = STANDARD_PRICE;
+            let description = 'Standard Registration';
+            let message = '';
+            let messageColor = '#ff6b6b';
+
+            if (referral && validCodes.includes(referral)) {
+                currentPrice = DISCOUNTED_PRICE;
+                description = 'Discount Applied!';
+                message = '✅ Valid referral code applied!';
+                messageColor = '#90ee90';
+            } else if (referral && !validCodes.includes(referral)) {
+                currentPrice = STANDARD_PRICE;
+                description = 'Invalid Referral Code';
+                message = '❌ Invalid referral code';
+            } else {
+                currentPrice = STANDARD_PRICE;
+                description = 'Standard Registration';
+                message = '';
+            }
+
+            priceDisplay.textContent = currentPrice;
+            priceDescription.textContent = description;
+            if (referralMessage) {
+                referralMessage.textContent = message;
+                referralMessage.style.color = messageColor;
+            }
+            
+            document.getElementById(formElements.paymentAmount).textContent = currentPrice;
+        }
+
+        function validateForm() {
+            console.log('[v0] ========== FORM VALIDATION START ==========');
+            console.log('[v0] Timestamp:', new Date().toLocaleString());
+            let isValid = true;
+            let errorCount = 0;
+
+            const requiredFields = [
+                { id: 'fullName', label: 'Full Name' },
+                { id: 'emailID', label: 'Email ID' },
+                { id: 'mobileNumber', label: 'Mobile Number' },
+                { id: 'age', label: 'Age' },
+                { id: 'weight', label: 'Weight' },
+                { id: 'height', label: 'Height' }
+            ];
+
+            requiredFields.forEach(field => {
+                const element = document.getElementById(field.id);
+                if (!element) {
+                    console.log(`[v0] WARNING: Field ${field.id} not found in DOM`);
+                    return;
+                }
+
+                const value = ('' + element.value || '').trim();
+                if (!value) {
+                    console.log(`[v0] VALIDATION ERROR: ${field.label} is empty`);
+                    element.classList.add('error');
+                    const errorMsg = element.parentElement.querySelector('.error-message');
+                    if (errorMsg) {
+                        errorMsg.textContent = `${field.label} is required`;
+                        errorMsg.classList.add('show');
+                    }
+                    isValid = false;
+                    errorCount++;
+                } else {
+                    element.classList.remove('error');
+                    const errorMsg = element.parentElement.querySelector('.error-message');
+                    if (errorMsg) {
+                        errorMsg.classList.remove('show');
+                    }
+                    console.log(`[v0] VALID: ${field.label} = ${value}`);
+                }
+            });
+
+            const sportCheckboxes = document.querySelectorAll('input[name="sports"]:checked');
+            const sportsErrorElement = document.getElementById('sportsError');
+
+            if (sportCheckboxes.length === 0) {
+                console.log('[v0] VALIDATION ERROR: No sports selected');
+                if (sportsErrorElement) {
+                    sportsErrorElement.textContent = 'Please select at least one sport';
+                    sportsErrorElement.classList.add('show');
+                } else {
+                    console.log('[v0] WARNING: sportsError element not found');
+                }
+                isValid = false;
+                errorCount++;
+            } else {
+                console.log(`[v0] VALID: ${sportCheckboxes.length} sports selected`);
+                if (sportsErrorElement) {
+                    sportsErrorElement.textContent = '';
+                    sportsErrorElement.classList.remove('show');
+                }
+            }
+
+            // Also check other required fields that might not be in the requiredFields array for convenience
+            const educationSelect = document.getElementById('education');
+            if (educationSelect && !educationSelect.value) {
+                console.log('[v0] VALIDATION ERROR: Education level is empty');
+                showError(educationSelect, 'Education level is required');
+                isValid = false;
+                errorCount++;
+            } else if (educationSelect) {
+                educationSelect.classList.remove('error');
+                educationSelect.parentElement.querySelector('.error-message').classList.remove('show');
+            }
+            
+            const addressTextarea = document.getElementById('address');
+            if (addressTextarea && !addressTextarea.value.trim()) {
+                console.log('[v0] VALIDATION ERROR: Address is empty');
+                showError(addressTextarea, 'Address is required');
+                isValid = false;
+                errorCount++;
+            } else if (addressTextarea) {
+                addressTextarea.classList.remove('error');
+                addressTextarea.parentElement.querySelector('.error-message').classList.remove('show');
+            }
+
+            // Payment section validation if shown
+            const paymentSection = document.getElementById('paymentSection');
+            if (paymentSection.classList.contains('show')) {
+                const fileInput = document.getElementById('paymentScreenshot');
+                if (fileInput && fileInput.files.length === 0) {
+                    console.log('[v0] VALIDATION ERROR: Payment screenshot is missing');
+                    showError(fileInput, 'Payment screenshot is required');
+                    isValid = false;
+                    errorCount++;
+                } else if (fileInput && fileInput.files.length > 0) {
+                    fileInput.classList.remove('error');
+                    const err = fileInput.parentElement.querySelector('.error-message');
+                    if (err) err.classList.remove('show');
+                }
+
+                const transactionIDInput = document.getElementById('transactionID');
+                if (transactionIDInput && !transactionIDInput.value.trim()) {
+                    console.log('[v0] VALIDATION ERROR: Transaction ID is empty');
+                    showError(transactionIDInput, 'Transaction ID is required');
+                    isValid = false;
+                    errorCount++;
+                } else if (transactionIDInput) {
+                    transactionIDInput.classList.remove('error');
+                    transactionIDInput.parentElement.querySelector('.error-message').classList.remove('show');
+                }
+
+                const accountHolderNameInput = document.getElementById('accountHolderName');
+                if (accountHolderNameInput && !accountHolderNameInput.value.trim()) {
+                    console.log('[v0] VALIDATION ERROR: Account Holder Name is empty');
+                    showError(accountHolderNameInput, 'Account Holder Name is required');
+                    isValid = false;
+                    errorCount++;
+                } else if (accountHolderNameInput) {
+                    accountHolderNameInput.classList.remove('error');
+                    accountHolderNameInput.parentElement.querySelector('.error-message').classList.remove('show');
+                }
+            }
+
+            console.log(`[v0] Form validation complete - isValid: ${isValid}, errors: ${errorCount}`);
+            console.log('[v0] ========== FORM VALIDATION END ==========');
+            return isValid;
+        }
+
+        function proceedToPayment() {
+            console.log('[v0] ========== PROCEED TO PAYMENT CLICKED ==========');
+            // Clear previous errors
+            document.querySelectorAll('.error-message').forEach(el => { el.textContent = ''; el.classList.remove('show'); });
+            document.querySelectorAll('input, select, textarea').forEach(el => el.classList.remove('error'));
+
+            if (!validateForm()) {
+                alert('❌ Please fill all required fields correctly!');
+                showToast('Form validation failed! Please check all fields.', 'error');
+                return;
+            }
+
+            document.getElementById('buttonGroup').style.display = 'none';
+            document.getElementById('paymentButtonGroup').style.display = 'grid';
+            document.getElementById('paymentSection').classList.add('show');
+
+            const participantName = document.getElementById('fullName').value;
+            document.getElementById('paymentParticipantName').textContent = participantName || '--';
+            document.getElementById('paymentAmount').textContent = document.getElementById('priceDisplay').textContent;
+
+            setTimeout(() => {
+                document.getElementById('paymentSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+
+        function goBackToForm() {
+            document.getElementById('paymentSection').classList.remove('show');
+            document.getElementById('buttonGroup').style.display = 'grid';
+            document.getElementById('paymentButtonGroup').style.display = 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function getLocation() {
+            return new Promise((resolve) => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        position => {
+                            userLocationData = {
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude,
+                                accuracy: position.coords.accuracy,
+                                altitude: position.coords.altitude,
+                                altitudeAccuracy: position.coords.altitudeAccuracy,
+                                heading: position.coords.heading,
+                                speed: position.coords.speed,
+                                timestamp: new Date(position.timestamp).toISOString()
+                            };
+                            console.log('[v0] Location data acquired');
+                            resolve(userLocationData);
+                        },
+                        error => {
+                            userLocationData = { error: error.message, timestamp: new Date().toISOString() };
+                            console.log('[v0] Location error:', error.message);
+                            resolve(userLocationData);
+                        }
+                    );
+                } else {
+                    userLocationData = { error: 'Geolocation not supported', timestamp: new Date().toISOString() };
+                    resolve(userLocationData);
+                }
+            });
+        }
+
+        async function getDeviceFingerprint() {
+            try {
+                if (!window.FingerprintJS) {
+                    console.warn('[v0] FingerprintJS not available');
+                    return { visitorId: 'unknown', confidence: { score: 0 } };
+                }
+                const fp = await FingerprintJS.load();
+                const result = await fp.get();
+                deviceFingerprint = {
+                    visitorId: result.visitorId,
+                    confidence: result.confidence,
+                    userAgent: navigator.userAgent,
+                    platform: navigator.platform,
+                    language: navigator.language,
+                    screen: { width: window.screen.width, height: window.screen.height, colorDepth: window.screen.colorDepth },
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                };
+                console.log('[v0] Device fingerprint initialized');
+                return deviceFingerprint;
+            } catch (error) {
+                console.log('[v0] Fingerprint error:', error);
+                return { error: error.message };
+            }
+        }
+
+        function generateParticipantID() {
+            const prefix = 'IW-2026-';
+            const randomNum = Math.floor(Math.random() * 900000) + 100000;
+            return prefix + String(randomNum).padStart(6, '0');
+        }
+
+        function createConfetti() {
+            const confetti = ['🏆', '💪', '🔥', '⚡', '🥇', '🎉', '✨', '🏋️'];
+            for (let i = 0; i < 40; i++) {
+                const piece = document.createElement('div');
+                piece.classList.add('confetti-piece');
+                piece.textContent = confetti[Math.floor(Math.random() * confetti.length)];
+                piece.style.left = Math.random() * 100 + 'vw';
+                piece.style.top = '-20px';
+                piece.style.animation = `confetti ${2 + Math.random() * 1}s ease-out forwards`;
+                document.body.appendChild(piece);
+                setTimeout(() => piece.remove(), 3500);
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('registrationForm').reset();
+            document.getElementById('paymentSection').classList.remove('show');
+            document.getElementById('buttonGroup').style.display = 'grid';
+            document.getElementById('paymentButtonGroup').style.display = 'none';
+            document.getElementById('successMessage').classList.remove('show');
+            document.getElementById('registrationForm').style.display = 'block';
+            document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+            document.querySelectorAll('input, select, textarea').forEach(el => el.classList.remove('error'));
+            document.getElementById('fileName').textContent = 'No file chosen';
+            const fileEl = document.getElementById('paymentScreenshot');
+            if (fileEl) fileEl.value = '';
+            updatePriceAndDescription();
+            userLocationData = null;
+            deviceFingerprint = null;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showSuccessPopup(participantID) {
+            document.getElementById('popupParticipantID').textContent = participantID;
+            document.getElementById('successPopupOverlay').classList.add('show');
+        }
+
+        function closeSuccessPopup() {
+            document.getElementById('successPopupOverlay').classList.remove('show');
+            resetForm();
+        }
+
+        // Event Listeners
+        document.getElementById('referralCode').addEventListener('input', updatePriceAndDescription);
+        document.getElementById('deadliftCheckbox').addEventListener('change', () => {
+            const deadliftCheckbox = document.getElementById('deadliftCheckbox');
+            const weightInput = document.getElementById('weight');
+            const sportsErrorEl = document.getElementById('sportsError');
+
+            if (deadliftCheckbox.checked && parseInt(weightInput.value) < DEADLIFT_MIN_WEIGHT) {
+                showError(weightInput, `For Deadlift, minimum body weight must be ${DEADLIFT_MIN_WEIGHT}kg.`);
+                deadliftCheckbox.checked = false;
+                if (sportsErrorEl) { sportsErrorEl.textContent = 'Deadlift requires minimum body weight of 50kg.'; sportsErrorEl.classList.add('show'); }
+            } else {
+                weightInput.classList.remove('error');
+                const err = weightInput.parentElement.querySelector('.error-message'); if (err) err.classList.remove('show');
+                if (sportsErrorEl) { sportsErrorEl.textContent = ''; sportsErrorEl.classList.remove('show'); }
+            }
+            updatePriceAndDescription();
+        });
+        document.getElementById('weight').addEventListener('input', () => {
+            const deadliftCheckbox = document.getElementById('deadliftCheckbox');
+            const weightInput = document.getElementById('weight');
+            const sportsErrorEl = document.getElementById('sportsError');
+
+            if (deadliftCheckbox.checked && parseInt(weightInput.value) < DEADLIFT_MIN_WEIGHT) {
+                showError(weightInput, `For Deadlift, minimum body weight must be ${DEADLIFT_MIN_WEIGHT}kg.`);
+                deadliftCheckbox.checked = false;
+                if (sportsErrorEl) { sportsErrorEl.textContent = 'Deadlift requires minimum body weight of 50kg.'; sportsErrorEl.classList.add('show'); }
+            } else if (!deadliftCheckbox.checked) {
+                weightInput.classList.remove('error');
+                const err = weightInput.parentElement.querySelector('.error-message'); if (err) err.classList.remove('show');
+                if (sportsErrorEl) { sportsErrorEl.textContent = ''; sportsErrorEl.classList.remove('show'); }
+            }
+            updatePriceAndDescription();
+        });
+
+        document.getElementById('paymentScreenshot').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const fileNameDisplay = document.getElementById('fileName');
+            if (file) {
+                fileNameDisplay.textContent = '✅ File selected: ' + file.name;
+                this.classList.remove('error');
+                const err = this.parentElement.querySelector('.error-message'); if (err) err.classList.remove('show');
+            } else {
+                fileNameDisplay.textContent = 'No file chosen';
+            }
+        });
+
+        document.getElementById('submitBtn').addEventListener('click', async function() {
+            console.log('[v0] ========== REGISTRATION SUBMISSION STARTED ==========');
+            console.log('[v0] Timestamp:', new Date().toLocaleString());
+            console.log('[v0] Browser:', navigator.userAgent);
+            console.log('[v0] Page URL:', window.location.href);
+            console.log('[v0] STEP 1: Submit button clicked - Starting registration process');
+            showToast('Starting registration process...', 'info');
+
+            // Clear previous errors
+            document.querySelectorAll('.error-message').forEach(el => { el.textContent = ''; el.classList.remove('show'); });
+            document.querySelectorAll('input, select, textarea').forEach(el => el.classList.remove('error'));
+
+            if (!validateForm()) {
+                alert('❌ Please fill all required fields correctly!');
+                console.log('[v0] STEP 1: Form validation failed');
+                showToast('Form validation failed! Please check all fields.', 'error');
+                return;
+            }
+
+            this.disabled = true;
+            this.textContent = '⏳ Submitting...';
+            console.log('[v0] STEP 2: Form validation passed - Button disabled and updating text');
+
+            try {
+                console.log('[v0] STEP 3: Starting location and fingerprint capture');
+                showToast('Fetching your location...', 'location');
+                const location = await getLocation();
+                console.log('[v0] STEP 4: Location captured:', JSON.stringify(location, null, 2));
+                showToast('Location captured!', 'success');
+
+                console.log('[v0] STEP 5: Starting device fingerprint capture');
+                showToast('Capturing device fingerprint...', 'fingerprint');
+                const fingerprint = await getDeviceFingerprint();
+                console.log('[v0] STEP 5.1: Device fingerprint captured:', JSON.stringify(fingerprint, null, 2));
+                showToast('Device fingerprint captured successfully!', 'success');
+
+                const participantID = generateParticipantID();
+                console.log('[v0] STEP 6: Participant ID generated:', participantID);
+                showToast('Participant ID generated: ' + participantID, 'info');
+
+                const screenshotFile = document.getElementById('paymentScreenshot').files[0];
+                console.log('[v0] STEP 7: Screenshot file selected:', screenshotFile ? screenshotFile.name : 'No file');
+
+                const transactionID = document.getElementById('transactionID').value.trim();
+                const accountHolderName = document.getElementById('accountHolderName').value.trim();
+                console.log('[v0] STEP 8: Transaction data retrieved:', transactionID, accountHolderName);
+
+                const formData = {
+                    personalInfo: {
+                        fullName: document.getElementById('fullName').value.trim(),
+                        emailID: document.getElementById('emailID').value.trim(),
+                        partnerName: document.getElementById('partnerName').value.trim() || 'N/A',
+                        education: document.getElementById('education').value.trim(),
+                    },
+                    contactInfo: {
+                        mobileNumber: document.getElementById('mobileNumber').value.trim(),
+                        whatsappNumber: document.getElementById('whatsappNumber').value.trim(),
+                        address: document.getElementById('address').value.trim(),
+                    },
+                    measurements: {
+                        age: parseInt(document.getElementById('age').value),
+                        height: document.getElementById('height').value,
+                        weight: parseInt(document.getElementById('weight').value),
+                    },
+                    sports: Array.from(document.querySelectorAll('input[name="sports"]:checked')).map(cb => cb.value),
+                    referralCode: document.getElementById('referralCode').value.trim() || 'None',
+                    fees: {
+                        originalFees: STANDARD_PRICE,
+                        finalFees: parseInt(document.getElementById('priceDisplay').textContent),
+                        discountApplied: document.getElementById('referralCode').value.trim() !== '' &&
+                                         ['monkey gym', 'bbd dairy', 'bankey bihari'].includes(document.getElementById('referralCode').value.trim().toLowerCase())
+                                         ? (STANDARD_PRICE - DISCOUNTED_PRICE).toString() : '0',
+                    },
+                    payment: {
+                        upiID: '9174486437@ybl',
+                        beneficiaryName: 'Vishnu Tiwari',
+                        transactionID: transactionID,
+                        accountHolderName: accountHolderName,
+                        screenshotUploaded: !!screenshotFile,
+                        screenshotURL: '',
+                        screenshotBlob: '',
+                    },
+                    deviceInfo: fingerprint,
+                    location: location,
+                    timestamp: new Date().toISOString(),
+                    participantID: participantID,
+                };
+
+                console.log('[v0] STEP 9: Form data object constructed');
+                console.log('[v0] STEP 10: Starting Firebase write operation');
+                console.log('[v0] Firebase path: registrations/' + participantID);
+
+                if (!database) {
+                    throw new Error('Firebase database is not initialized. Database object is null.');
+                }
+
+                console.log('[v0] STEP 10.1: Database object verified - proceeding with write');
+                await database.ref('registrations/' + participantID).set(formData);
+                console.log('[v0] ✅ Form data successfully saved to Firebase');
+                showToast('Registration data saved to Firebase! ✨', 'success');
+
+                if (screenshotFile) {
+                    // Convert to base64 and save to DB under screenshots/<participantID>
+                    console.log('[v0] STEP 11: Processing screenshot file - converting to base64');
+                    showToast('Converting screenshot to blob...', 'blob');
+
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        try {
+                            const arrayBuffer = e.target.result;
+                            // convert to base64
+                            const bytes = new Uint8Array(arrayBuffer);
+                            let binary = '';
+                            const chunkSize = 0x8000;
+                            for (let i = 0; i < bytes.length; i += chunkSize) {
+                                const chunk = bytes.subarray(i, i + chunkSize);
+                                binary += String.fromCharCode.apply(null, chunk);
+                            }
+                            const base64String = btoa(binary);
+
+                            const screenshotPath = 'screenshots/' + participantID + '_screenshot.json';
+                            console.log('[v0] STEP 12: Writing screenshot blob to Firebase at', screenshotPath);
+
+                            await database.ref(screenshotPath).set({
+                                data: base64String,
+                                filename: screenshotFile.name,
+                                size: screenshotFile.size,
+                                type: screenshotFile.type,
+                                uploadedAt: new Date().toISOString()
+                            });
+
+                            // store screenshot reference in main record for convenience
+                            await database.ref('registrations/' + participantID + '/payment/screenshotFilename').set(screenshotFile.name);
+                            await database.ref('registrations/' + participantID + '/payment/screenshotSize').set(screenshotFile.size);
+
+                            console.log('[v0] ✅ Screenshot blob successfully saved to Firebase');
+                            showToast('Screenshot uploaded!', 'success');
+                        } catch (blobErr) {
+                            console.error('[v0] ❌ STEP 12 ERROR: Failed to save screenshot blob', blobErr);
+                            showToast('Error uploading screenshot: ' + (blobErr.message || blobErr), 'error');
+                        }
+                    };
+                    reader.onerror = function(error) {
+                        console.error('[v0] ❌ FileReader error', error);
+                        showToast('Error reading file: ' + error.message, 'error');
+                    };
+                    reader.readAsArrayBuffer(screenshotFile);
+                }
+
+                console.log('[v0] STEP 13: Preparing WhatsApp message with location data');
+                showToast('Preparing WhatsApp confirmation...', 'info');
+                shareToWhatsApp(formData);
+                showToast('WhatsApp message opened!', 'success');
+
+                console.log('[v0] STEP 14: Creating confetti animation and showing success popup');
+                createConfetti();
+                showSuccessPopup(participantID);
+                showToast('🎉 Registration completed successfully!', 'success');
+
+                console.log('[v0] ✅ STEP 15: Registration completed successfully!');
+                this.disabled = false;
+                this.textContent = 'Finalize Registration';
+            } catch (err) {
+                console.error('[v0] ========== ERROR OCCURRED ==========');
+                console.error('[v0] ❌ ERROR CAUGHT: Registration failed with error');
+                console.error('[v0] Error message:', err.message || err);
+                showToast('Error: ' + (err.message || err), 'error');
+                alert('❌ Error submitting registration. Please try again.\n' + (err.message || err));
+                this.disabled = false;
+                this.textContent = 'Finalize Registration';
+            }
+        });
+
+        // WhatsApp sharing helper
+        function shareToWhatsApp(formData) {
+            try {
+                const messageLines = [
+                    `*THE IRON WARRIORS - Registration*`,
+                    `Participant: ${formData.personalInfo.fullName}`,
+                    `Participant ID: ${formData.participantID}`,
+                    `Phone: ${formData.contactInfo.mobileNumber}`,
+                    `Email: ${formData.personalInfo.emailID}`,
+                    `Sports: ${formData.sports.join(', ')}`,
+                    `Fees Paid: ₹${formData.fees.finalFees}`,
+                    `Transaction ID: ${formData.payment.transactionID}`,
+                    `Time: ${new Date().toLocaleString()}`
+                ];
+                if (formData.location && formData.location.latitude) {
+                    messageLines.push(`Location: https://www.google.com/maps/search/?api=1&query=${formData.location.latitude},${formData.location.longitude}`);
+                }
+                const text = encodeURIComponent(messageLines.join('\n'));
+                const url = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${text}`;
+                window.open(url, '_blank');
+            } catch (e) {
+                console.warn('WhatsApp sharing failed', e);
+            }
+        }
+
+        // Initialize price text on load
+        updatePriceAndDescription();
+    </script>
+</body>
+</html>
