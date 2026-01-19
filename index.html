@@ -61,6 +61,21 @@
     border-radius:6px;
     margin:0 2px;
 }
+.error-message {
+    color: #e53935;
+    font-size: 0.75em;
+    margin-top: 4px;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+}
+
+input.error {
+    border-color: #e53935;
+}
+
         .container { max-width: 900px; margin: 30px auto; padding: 30px 20px; background: rgba(255,255,255,0.05); border-radius: 20px; border: 2px solid var(--primary); box-shadow: 0 25px 70px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1); backdrop-filter: blur(12px); animation: fadeIn 0.8s ease 0.2s both; }
         .form-section { margin-bottom: 35px; }
         .section-title { font-size: 1.4em; color: var(--primary); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 3px solid var(--accent); font-weight: 700; }
@@ -186,6 +201,13 @@
          Reporting Time: 9:00 AM
     </p>
             </div>
+           <div class="detail-box prize-box glow">
+    <h4>👑 Championship Honors</h4>
+    <p class="prize-amount">Compete for ₹21,000+ in Total Prizes</p>
+    <p class="prize -title">Exciting rewards for top performers</p>
+    <p class="prize-sub">Register now and chase the victory!</p>
+</div>
+
         </div>
     </div>
 
@@ -201,26 +223,43 @@
                         <input type="text" id="fullName" required placeholder="Enter your full name">
                         <span class="error-message"></span>
                     </div>
-                    <div class="form-group">
-                        <label for="emailID">Email ID *</label>
-                        <input type="email" id="emailID" required placeholder="your.email@example.com">
-                        <span class="error-message"></span>
-                    </div>
+                  <div class="form-group">
+    <label for="emailID">Email ID *</label>
+    <input type="email" id="emailID" required placeholder="your.email@example.com">
+    <small class="disclaimer-text">📩 This email will be used for verification at the event venue.</small>
+    <span class="error-message"></span>
+</div>
+
                     <div class="form-group">
                         <label for="age">Age *</label>
                         <input type="number" id="age" required min="18" placeholder="Your age">
                         <span class="error-message"></span>
                     </div>
-                    <div class="form-group">
-                        <label for="mobileNumber">Mobile Number *</label>
-                        <input type="tel" id="mobileNumber" required placeholder="10-digit mobile number">
-                        <span class="error-message"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="whatsappNumber">WhatsApp Number *</label>
-                        <input type="tel" id="whatsappNumber" required placeholder="10-digit WhatsApp number">
-                        <span class="error-message"></span>
-                    </div>
+      <div class="form-group">
+    <label for="mobileNumber">Mobile Number *</label>
+    <input type="tel"
+           id="mobileNumber"
+           required
+           placeholder="10-digit mobile number"
+           inputmode="numeric"
+           pattern="[0-9]{10}"
+           maxlength="10">
+    <span class="error-message"></span>
+</div>
+
+<div class="form-group">
+    <label for="whatsappNumber">WhatsApp Number *</label>
+    <input type="tel"
+           id="whatsappNumber"
+           required
+           placeholder="10-digit WhatsApp number"
+           inputmode="numeric"
+           pattern="[0-9]{10}"
+           maxlength="10">
+    <span class="error-message"></span>
+</div>
+
+
                     <div class="form-group">
                         <label for="partnerName">Partner Name (Optional)</label>
                         <input type="text" id="partnerName" placeholder="If registering with a partner">
@@ -252,16 +291,32 @@
             <div class="form-section">
                 <div class="section-title">Physical Information</div>
                 <div class="form-grid">
+                <div class="form-group">
+    <label for="height">Height (in feet) *</label>
+    <input type="text"
+           id="height"
+           required
+           placeholder="e.g., 5.8"
+           inputmode="decimal"
+           pattern="^\d+(\.\d{1,2})?$"
+           oninput="this.value = this.value
+                        .replace(/[^0-9.]/g, '')
+                        .replace(/(\..*)\./g, '$1');">
+    <span class="error-message"></span>
+</div>
+
                     <div class="form-group">
-                        <label for="height">Height (in feet) *</label>
-                        <input type="text" id="height" required placeholder="e.g., 5'10&quot;">
-                        <span class="error-message"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="weight">Weight (in kg) *</label>
-                        <input type="number" id="weight" required placeholder="Your body weight">
-                        <span class="error-message"></span>
-                    </div>
+    <label for="weight">Weight (in kg) *</label>
+    <input type="number"
+           id="weight"
+           required
+           placeholder="Minimum 50 kg"
+           min="50"
+           inputmode="numeric"
+           oninput="if(this.value && this.value < 50) this.setCustomValidity('Weight must be at least 50 kg'); else this.setCustomValidity('');">
+    <span class="error-message"></span>
+</div>
+
                 </div>
                 <div class="form-group" style="margin-top: 12px;">
                     <label for="address">Current Address *</label>
@@ -270,7 +325,7 @@
                 </div>
             </div>
 
-    <!-- Sports Selection Section -->
+   <!-- Sports Selection Section -->
 <div class="form-section">
     <div class="section-title">Let’s Go Beast Mode! Your Power Events Are Locked In:</div>
     <p style="margin-bottom: 12px; color: rgba(255,255,255,0.8); font-size: 0.85em;">
@@ -301,7 +356,6 @@
             💥 Bench Press
         </label>
     </div>
-
 
 
                 <span class="error-message" id="sportsError"></span>
@@ -338,7 +392,7 @@
 
     <!-- QR Image -->
     <div style="text-align:center; margin:15px 0;">
-        <img src="./qrcodeImageBBDEvent.jpeg" 
+        <img src="image/qrcodeImageBBDEvent.jpeg" 
              alt="UPI QR Code" 
              style="width:200px; max-width:100%; border:2px solid #ddd; border-radius:10px;">
         <p style="font-size:14px; margin-top:6px;">Scan & Pay using any UPI app</p>
@@ -411,9 +465,9 @@
     <div id="successPopupOverlay" class="success-popup-overlay">
         <div class="success-popup-content">
             <div class="success-popup-icon">🎉</div>
-            <h2>Payment Received! ✅</h2>
-            <p>Your payment has been successfully recorded in our database.</p>
-            <p>A confirmation WhatsApp message has been sent to your number.</p>
+            <h2>Registration Successful ✅</h2>
+            <p>Your interest has been successfully recorded.</p>
+            <p>A confirmation WhatsApp message has been sent to your number very soon.</p>
             
             <div class="participant-id-display">
                 <label>Your Unique Participant ID:</label>
@@ -421,7 +475,7 @@
             </div>
 
             <p style="font-size: 0.9em; color: rgba(255,255,255,0.7);">
-                Save this ID for future reference and event day check-in.
+                Save this ID, and your registered emailID for future verification at event day check-in.
             </p>
 
             <button type="button" class="success-popup-close" onclick="closeSuccessPopup()">Close</button>
@@ -452,16 +506,15 @@
 
     <script>
         /* ========== Firebase config (update if needed) ========== */
-        const firebaseConfig = {
-            apiKey: "AIzaSyA-eh_d_faCoY7eWdnNCHh88anFvZbjBZA",
-            authDomain: "registration-form---bbd-event.firebaseapp.com",
-            databaseURL: "https://registration-form---bbd-event-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "registration-form---bbd-event",
-            // Confirm your storage bucket in Firebase Console. Commonly "<project-id>.appspot.com"
-            storageBucket: "registration-form---bbd-event.appspot.com",
-            messagingSenderId: "141575270320",
-            appId: "1:141575270320:web:e3e2c0a8b1bda4482d3075"
-        };
+      const firebaseConfig = {
+  apiKey: "AIzaSyA-eh_d_faCoY7eWdnNCHh88anFvZbjBZA",
+  authDomain: "registration-form---bbd-event.firebaseapp.com",
+  databaseURL: "https://registration-form---bbd-event-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "registration-form---bbd-event",
+  storageBucket: "registration-form---bbd-event.firebasestorage.app",
+  messagingSenderId: "141575270320",
+  appId: "1:141575270320:web:e3e2c0a8b1bda4482d3075"
+};
 
         const WHATSAPP_NUMBER = '8965041460';
         let userLocationData = null;
@@ -620,6 +673,29 @@
             
             document.getElementById(formElements.paymentAmount).textContent = currentPrice;
         }
+function setupPhoneValidation(inputId) {
+    const input = document.getElementById(inputId);
+    const error = input.nextElementSibling;
+
+    input.addEventListener('input', () => {
+        // allow only numbers
+        input.value = input.value.replace(/[^0-9]/g, '');
+
+        if (input.value.length > 0 && input.value.length < 10) {
+            error.textContent = 'Mobile or whatsapp number must be exactly 10 digits';
+            error.classList.add('show');
+            input.classList.add('error');
+        } else {
+            error.textContent = '';
+            error.classList.remove('show');
+            input.classList.remove('error');
+        }
+    });
+}
+
+// Apply to both fields
+setupPhoneValidation('mobileNumber');
+setupPhoneValidation('whatsappNumber');
 
         function validateForm() {
             console.log('[v0] ========== FORM VALIDATION START ==========');
@@ -667,7 +743,8 @@
             const sportCheckboxes = document.querySelectorAll('input[name="sports"]:checked');
             const sportsErrorElement = document.getElementById('sportsError');
 
-         
+           
+
             // Also check other required fields that might not be in the requiredFields array for convenience
             const educationSelect = document.getElementById('education');
             if (educationSelect && !educationSelect.value) {
@@ -819,30 +896,83 @@ setInterval(() => {
     document.getElementById("seconds").innerText = seconds;
 
 }, 1000);
-        async function getDeviceFingerprint() {
-            try {
-                if (!window.FingerprintJS) {
-                    console.warn('[v0] FingerprintJS not available');
-                    return { visitorId: 'unknown', confidence: { score: 0 } };
-                }
-                const fp = await FingerprintJS.load();
-                const result = await fp.get();
-                deviceFingerprint = {
-                    visitorId: result.visitorId,
-                    confidence: result.confidence,
-                    userAgent: navigator.userAgent,
-                    platform: navigator.platform,
-                    language: navigator.language,
-                    screen: { width: window.screen.width, height: window.screen.height, colorDepth: window.screen.colorDepth },
-                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-                };
-                console.log('[v0] Device fingerprint initialized');
-                return deviceFingerprint;
-            } catch (error) {
-                console.log('[v0] Fingerprint error:', error);
-                return { error: error.message };
-            }
+ 
+function getDeviceFingerprint() {
+    try {
+        const ua = navigator.userAgent;
+
+        // ---- OS Detection ----
+        let osName = 'Unknown';
+        let osVersion = 'Unknown';
+
+        if (/Android/.test(ua)) {
+            osName = 'Android';
+            const match = ua.match(/Android\s([0-9\.]+)/);
+            if (match) osVersion = match[1];
+        } else if (/iPhone|iPad|iPod/.test(ua)) {
+            osName = 'iOS';
+            const match = ua.match(/OS\s([0-9\_]+)/);
+            if (match) osVersion = match[1].replace(/_/g, '.');
+        } else if (/Windows NT/.test(ua)) {
+            osName = 'Windows';
+            const match = ua.match(/Windows NT\s([0-9\.]+)/);
+            if (match) osVersion = match[1];
+        } else if (/Mac OS X/.test(ua)) {
+            osName = 'macOS';
+            const match = ua.match(/Mac OS X\s([0-9\_]+)/);
+            if (match) osVersion = match[1].replace(/_/g, '.');
         }
+
+        // ---- Device / Model (best effort) ----
+        let deviceName = 'Unknown Device';
+        let modelName = 'Unknown';
+        let modelNumber = 'Unknown';
+
+        if (/Android/.test(ua)) {
+            // Example: "Pixel 6", "SM-A125F", "Redmi Note 10"
+            const modelMatch = ua.match(/Android.*;\s([^)]+)\)/);
+            if (modelMatch) {
+                deviceName = modelMatch[1].trim();
+                modelName = deviceName;
+                modelNumber = deviceName;
+            }
+        } else if (/iPhone/.test(ua)) {
+            deviceName = 'Apple iPhone';
+            modelName = 'iPhone';
+        } else if (/iPad/.test(ua)) {
+            deviceName = 'Apple iPad';
+            modelName = 'iPad';
+        }
+
+        // ---- Screen Resolution ----
+        const screenResolution = `${window.screen.width} x ${window.screen.height}`;
+
+        // ---- Simple Device ID (not fingerprint) ----
+        let deviceID = localStorage.getItem('simpleDeviceID');
+        if (!deviceID) {
+            deviceID = 'DEV-' + Math.random().toString(36).substring(2, 12).toUpperCase();
+            localStorage.setItem('simpleDeviceID', deviceID);
+        }
+
+        const deviceInfo = {
+            deviceName: deviceName,
+            modelName: modelName,
+            modelNumber: modelNumber,
+            osName: osName,
+            osVersion: osVersion,
+            screenResolution: screenResolution,
+            deviceID: deviceID
+        };
+
+        console.log('[v0] Device info captured:', deviceInfo);
+        return deviceInfo;
+
+    } catch (error) {
+        console.error('[v0] Device info error:', error);
+        return { error: error.message };
+    }
+}
+
 
         function generateParticipantID() {
             const prefix = 'IW-2026-';
@@ -892,54 +1022,58 @@ setInterval(() => {
             resetForm();
         }
 
-        // Event Listeners
-        document.getElementById('referralCode').addEventListener('input', updatePriceAndDescription);
-        document.getElementById('deadliftCheckbox').addEventListener('change', () => {
-            const deadliftCheckbox = document.getElementById('deadliftCheckbox');
-            const weightInput = document.getElementById('weight');
-            const sportsErrorEl = document.getElementById('sportsError');
+        
+        // All Event Listeners - Wrapped in DOMContentLoaded for proper timing
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[v0] ========== DOMCONTENTLOADED EVENT FIRED ==========');
+            console.log('[v0] DOM is fully loaded, attaching all event listeners');
 
-            if (deadliftCheckbox.checked && parseInt(weightInput.value) < DEADLIFT_MIN_WEIGHT) {
-                showError(weightInput, `For Deadlift, minimum body weight must be ${DEADLIFT_MIN_WEIGHT}kg.`);
-                deadliftCheckbox.checked = false;
-                if (sportsErrorEl) { sportsErrorEl.textContent = 'Deadlift requires minimum body weight of 50kg.'; sportsErrorEl.classList.add('show'); }
+            // Referral Code Listener
+            const referralCodeEl = document.getElementById('referralCode');
+            if (referralCodeEl) {
+                referralCodeEl.addEventListener('input', updatePriceAndDescription);
+                console.log('[v0] ✅ Referral code listener attached');
             } else {
-                weightInput.classList.remove('error');
-                const err = weightInput.parentElement.querySelector('.error-message'); if (err) err.classList.remove('show');
-                if (sportsErrorEl) { sportsErrorEl.textContent = ''; sportsErrorEl.classList.remove('show'); }
+                console.warn('[v0] ❌ referralCode element not found');
             }
-            updatePriceAndDescription();
-        });
-        document.getElementById('weight').addEventListener('input', () => {
-            const deadliftCheckbox = document.getElementById('deadliftCheckbox');
-            const weightInput = document.getElementById('weight');
-            const sportsErrorEl = document.getElementById('sportsError');
 
-            if (deadliftCheckbox.checked && parseInt(weightInput.value) < DEADLIFT_MIN_WEIGHT) {
-                showError(weightInput, `For Deadlift, minimum body weight must be ${DEADLIFT_MIN_WEIGHT}kg.`);
-                deadliftCheckbox.checked = false;
-                if (sportsErrorEl) { sportsErrorEl.textContent = 'Deadlift requires minimum body weight of 50kg.'; sportsErrorEl.classList.add('show'); }
-            } else if (!deadliftCheckbox.checked) {
-                weightInput.classList.remove('error');
-                const err = weightInput.parentElement.querySelector('.error-message'); if (err) err.classList.remove('show');
-                if (sportsErrorEl) { sportsErrorEl.textContent = ''; sportsErrorEl.classList.remove('show'); }
-            }
-            updatePriceAndDescription();
-        });
-
-        document.getElementById('paymentScreenshot').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const fileNameDisplay = document.getElementById('fileName');
-            if (file) {
-                fileNameDisplay.textContent = '✅ File selected: ' + file.name;
-                this.classList.remove('error');
-                const err = this.parentElement.querySelector('.error-message'); if (err) err.classList.remove('show');
+            // Payment Screenshot File Upload Listener
+            const paymentScreenshotEl = document.getElementById('paymentScreenshot');
+            if (paymentScreenshotEl) {
+                console.log('[v0] Found paymentScreenshot element, attaching listener');
+                paymentScreenshotEl.addEventListener('change', function(e) {
+                    console.log('[v0] ========== FILE INPUT CHANGE EVENT FIRED ==========');
+                    const file = e.target.files[0];
+                    const fileNameDisplay = document.getElementById('fileName');
+                    
+                    console.log('[v0] File selected:', file ? file.name : 'No file selected');
+                    console.log('[v0] File size:', file ? (file.size / 1024).toFixed(2) + ' KB' : 'N/A');
+                    console.log('[v0] File type:', file ? file.type : 'N/A');
+                    
+                    if (fileNameDisplay) {
+                        if (file) {
+                            console.log('[v0] ✅ File selected, updating display');
+                            fileNameDisplay.textContent = '✅ File selected: ' + file.name + ' (' + (file.size / 1024).toFixed(2) + ' KB)';
+                            fileNameDisplay.style.color = '#90ee90';
+                            console.log('[v0] ✅ Display updated successfully');
+                            showToast('Screenshot ready: ' + file.name, 'success');
+                        } else {
+                            console.log('[v0] No file selected');
+                            fileNameDisplay.textContent = 'No file chosen';
+                        }
+                    } else {
+                        console.warn('[v0] ❌ fileName display element not found');
+                    }
+                });
+                console.log('[v0] ✅ Payment screenshot listener attached');
             } else {
-                fileNameDisplay.textContent = 'No file chosen';
+                console.warn('[v0] ❌ paymentScreenshot element not found');
             }
-        });
 
-        document.getElementById('submitBtn').addEventListener('click', async function() {
+            // Submit Button Listener
+            const submitBtnEl = document.getElementById('submitBtn');
+            if (submitBtnEl) {
+                submitBtnEl.addEventListener('click', async function() {
             console.log('[v0] ========== REGISTRATION SUBMISSION STARTED ==========');
             console.log('[v0] Timestamp:', new Date().toLocaleString());
             console.log('[v0] Browser:', navigator.userAgent);
@@ -986,46 +1120,55 @@ setInterval(() => {
                 const accountHolderName = document.getElementById('accountHolderName').value.trim();
                 console.log('[v0] STEP 8: Transaction data retrieved:', transactionID, accountHolderName);
 
-                const formData = {
-                    personalInfo: {
-                        fullName: document.getElementById('fullName').value.trim(),
-                        emailID: document.getElementById('emailID').value.trim(),
-                        partnerName: document.getElementById('partnerName').value.trim() || 'N/A',
-                        education: document.getElementById('education').value.trim(),
-                    },
-                    contactInfo: {
-                        mobileNumber: document.getElementById('mobileNumber').value.trim(),
-                        whatsappNumber: document.getElementById('whatsappNumber').value.trim(),
-                        address: document.getElementById('address').value.trim(),
-                    },
-                    measurements: {
-                        age: parseInt(document.getElementById('age').value),
-                        height: document.getElementById('height').value,
-                        weight: parseInt(document.getElementById('weight').value),
-                    },
-                    sports: Array.from(document.querySelectorAll('input[name="sports"]:checked')).map(cb => cb.value),
-                    referralCode: document.getElementById('referralCode').value.trim() || 'None',
-                    fees: {
-                        originalFees: STANDARD_PRICE,
-                        finalFees: parseInt(document.getElementById('priceDisplay').textContent),
-                        discountApplied: document.getElementById('referralCode').value.trim() !== '' &&
-                                         ['monkey gym', 'bbd dairy', 'bankey bihari'].includes(document.getElementById('referralCode').value.trim().toLowerCase())
-                                         ? (STANDARD_PRICE - DISCOUNTED_PRICE).toString() : '0',
-                    },
-                    payment: {
-                        upiID: '9174486437@ybl',
-                        beneficiaryName: 'Vishnu Tiwari',
-                        transactionID: transactionID,
-                        accountHolderName: accountHolderName,
-                        screenshotUploaded: !!screenshotFile,
-                        screenshotURL: '',
-                        screenshotBlob: '',
-                    },
-                    deviceInfo: fingerprint,
-                    location: location,
-                    timestamp: new Date().toISOString(),
-                    participantID: participantID,
-                };
+               const formData = {
+    // Personal Info
+    fullName: document.getElementById('fullName').value.trim(),
+    emailID: document.getElementById('emailID').value.trim(),
+    partnerName: document.getElementById('partnerName').value.trim() || 'N/A',
+    education: document.getElementById('education').value.trim(),
+
+    // Contact Info
+    mobileNumber: document.getElementById('mobileNumber').value.trim(),
+    whatsappNumber: document.getElementById('whatsappNumber').value.trim(),
+    address: document.getElementById('address').value.trim(),
+
+    // Measurements
+    age: parseInt(document.getElementById('age').value),
+    height: document.getElementById('height').value,
+    weight: parseInt(document.getElementById('weight').value),
+
+
+    // Referral & Fees
+    referralCode: document.getElementById('referralCode').value.trim() || 'None',
+    originalFees: STANDARD_PRICE,
+    finalFees: parseInt(document.getElementById('priceDisplay').textContent),
+    discountApplied:
+        document.getElementById('referralCode').value.trim() !== '' &&
+        ['monkey gym', 'bbd dairy', 'bankey bihari']
+            .includes(document.getElementById('referralCode').value.trim().toLowerCase())
+            ? (STANDARD_PRICE - DISCOUNTED_PRICE)
+            : 0,
+
+    // Payment Info
+    upiID: 'bbdnutritionorganic@okaxis',
+    beneficiaryName: 'Vishnu bhadoriya',
+    transactionID: transactionID,
+    accountHolderName: accountHolderName,
+    
+    screenshotUploaded: !!screenshotFile,
+    screenshotURL: '',
+    screenshotBlob: '',
+
+    // Device & Meta
+    deviceInfo: fingerprint,
+   latitude: location?.latitude ?? null,
+longitude: location?.longitude ?? null,
+accuracy: location?.accuracy ?? null,
+
+    timestamp: new Date().toISOString(),
+    participantID: participantID,
+};
+
 
                 console.log('[v0] STEP 9: Form data object constructed');
                 console.log('[v0] STEP 10: Starting Firebase write operation');
@@ -1038,7 +1181,7 @@ setInterval(() => {
                 console.log('[v0] STEP 10.1: Database object verified - proceeding with write');
                 await database.ref('registrations/' + participantID).set(formData);
                 console.log('[v0] ✅ Form data successfully saved to Firebase');
-                showToast('Registration data saved to Firebase! ✨', 'success');
+                showToast('Registration data saved to DB! ✨', 'success');
 
                 if (screenshotFile) {
                     // Convert to base64 and save to DB under screenshots/<participantID>
@@ -1059,15 +1202,14 @@ setInterval(() => {
                             }
                             const base64String = btoa(binary);
 
-                            const screenshotPath = 'screenshots/' + participantID + '_screenshot.json';
+                            const screenshotPath = 'screenshots/' + participantID + '_screenshot';
                             console.log('[v0] STEP 12: Writing screenshot blob to Firebase at', screenshotPath);
 
                             await database.ref(screenshotPath).set({
                                 data: base64String,
                                 filename: screenshotFile.name,
-                                size: screenshotFile.size,
-                                type: screenshotFile.type,
-                                uploadedAt: new Date().toISOString()
+                    
+                             uploadedAt: new Date().toISOString()
                             });
 
                             // store screenshot reference in main record for convenience
@@ -1110,39 +1252,52 @@ setInterval(() => {
                 this.disabled = false;
                 this.textContent = 'Finalize Registration';
             }
-        });
+                }); // End submitBtn listener
+                console.log('[v0] ✅ Submit button listener attached');
+            } else {
+                console.warn('[v0] ❌ submitBtn element not found');
+                shareToWhatsApp(formData);
+            }
+
+            console.log('[v0] ========== ALL EVENT LISTENERS ATTACHED SUCCESSFULLY ==========');
+        }); // End DOMContentLoaded event
 
         // WhatsApp sharing helper
         function shareToWhatsApp(formData) {
-            try {
-                const messageLines = [
-                    `*THE IRON WARRIORS - Registration*`,
-                    `Participant: ${formData.personalInfo.fullName}`,
-                    `Participant ID: ${formData.participantID}`,
-                    `Phone: ${formData.contactInfo.mobileNumber}`,
-                    `Email: ${formData.personalInfo.emailID}`,
-                    `Sports: ${formData.sports.join(', ')}`,
-                    `Fees Paid: ₹${formData.fees.finalFees}`,
-                    `Transaction ID: ${formData.payment.transactionID}`,
-                    `Time: ${new Date().toLocaleString()}`
-                ];
-                if (formData.location && formData.location.latitude) {
-                    messageLines.push(`Location: https://www.google.com/maps/search/?api=1&query=${formData.location.latitude},${formData.location.longitude}`);
-                }
-                const text = encodeURIComponent(messageLines.join('\n'));
-                const url = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${text}`;
-                window.open(url, '_blank');
-            } catch (e) {
-                console.warn('WhatsApp sharing failed', e);
-            }
+    try {
+        const messageLines = [
+            `*THE IRON WARRIORS - Registration Confirmed*`,
+            ``,
+            `👤 Name: ${formData.fullName}`,
+            `🆔 Participant ID: ${formData.participantID}`,
+            `📞 Mobile: ${formData.mobileNumber}`,
+            `📧 Email: ${formData.emailID}`,
+            ``,
+            `💰 Fees Paid: ₹${formData.finalFees}`,
+            `🔁 Transaction ID: ${formData.transactionID}`,
+            `⏰ Time: ${new Date().toLocaleString()}`,
+        ];
+
+        if (formData.latitude && formData.longitude) {
+            messageLines.push(
+                `📍 Location: https://www.google.com/maps/search/?api=1&query=${formData.latitude},${formData.longitude}`
+            );
         }
 
+        const text = encodeURIComponent(messageLines.join('\n'));
+        const url = `https://api.whatsapp.com/send?phone=91${WHATSAPP_NUMBER}&text=${text}`;
+
+        // redirect user to WhatsApp
+        window.location.href = url;
+
+    } catch (e) {
+        console.warn('WhatsApp sharing failed', e);
+    }
+}
+
+        
         // Initialize price text on load
         updatePriceAndDescription();
     </script>
 </body>
 </html>
-
-
-
-
