@@ -667,24 +667,7 @@
             const sportCheckboxes = document.querySelectorAll('input[name="sports"]:checked');
             const sportsErrorElement = document.getElementById('sportsError');
 
-            if (sportCheckboxes.length === 0) {
-                console.log('[v0] VALIDATION ERROR: No sports selected');
-                if (sportsErrorElement) {
-                    sportsErrorElement.textContent = 'Please select at least one sport';
-                    sportsErrorElement.classList.add('show');
-                } else {
-                    console.log('[v0] WARNING: sportsError element not found');
-                }
-                isValid = false;
-                errorCount++;
-            } else {
-                console.log(`[v0] VALID: ${sportCheckboxes.length} sports selected`);
-                if (sportsErrorElement) {
-                    sportsErrorElement.textContent = '';
-                    sportsErrorElement.classList.remove('show');
-                }
-            }
-
+         
             // Also check other required fields that might not be in the requiredFields array for convenience
             const educationSelect = document.getElementById('education');
             if (educationSelect && !educationSelect.value) {
@@ -1159,5 +1142,6 @@ setInterval(() => {
     </script>
 </body>
 </html>
+
 
 
