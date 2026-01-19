@@ -270,24 +270,39 @@
                 </div>
             </div>
 
-            <!-- Sports Selection Section -->
-            <div class="form-section">
-                <div class="section-title">Let’s Go Beast Mode! Your Power Events Are Locked In: </div>
-                <p style="margin-bottom: 12px; color: rgba(255,255,255,0.8); font-size: 0.85em;">
-                    ⚠️ Deadlift requires minimum body weight of 50kg
-                </p>
-               <div class="info-group" style="
-    background:#222222;
-    padding:12px;
-    border-radius:10px;
-    border:1px solid #0f0909;
-">
-    <p style="margin-bottom:8px;"><strong>Ready to Sweat? Your Powerlifting Line-Up Is Here! 💪</strong></p>
+    <!-- Sports Selection Section -->
+<div class="form-section">
+    <div class="section-title">Let’s Go Beast Mode! Your Power Events Are Locked In:</div>
+    <p style="margin-bottom: 12px; color: rgba(255,255,255,0.8); font-size: 0.85em;">
+        ⚠️ Deadlift requires minimum body weight of 50kg
+    </p>
 
-    <div>🦵 Squats</div>
-    <div>🎯 Deadlift</div>
-    <div>💥 Bench Press</div>
+    <div class="info-group" style="
+        background:#222222;
+        padding:12px;
+        border-radius:10px;
+        border:1px solid #0f0909;
+    ">
+        <p style="margin-bottom:8px;"><strong>Ready to Sweat? Your Powerlifting Line-Up Is Here! 💪</strong></p>
+
+        <!-- Checkboxes (checked & disabled) -->
+        <label style="display:flex; align-items:center; gap:10px; color:#fff; margin-bottom:6px;">
+            <input type="checkbox" checked disabled style="accent-color:#ff6b00;">
+            🦵 Squats
+        </label>
+
+        <label style="display:flex; align-items:center; gap:10px; color:#fff; margin-bottom:6px;">
+            <input type="checkbox" checked disabled style="accent-color:#ff6b00;">
+            🎯 Deadlift
+        </label>
+
+        <label style="display:flex; align-items:center; gap:10px; color:#fff; margin-bottom:6px;">
+            <input type="checkbox" checked disabled style="accent-color:#ff6b00;">
+            💥 Bench Press
+        </label>
+    </div>
 </div>
+
 
                 <span class="error-message" id="sportsError"></span>
             </div>
@@ -1144,4 +1159,5 @@ setInterval(() => {
     </script>
 </body>
 </html>
+
 
