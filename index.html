@@ -642,7 +642,7 @@ input.error {
             const referralMessage = document.getElementById('referralMessage');
 
             const referral = referralCodeInput.value.toLowerCase().trim();
-            const validCodes = ['Muscular26', 'BBDHN26', 'PROMO26','SPON26'];
+            const validCodes = ['muscular26', 'bbdhn26', 'promo26','spon26','iwins26'];
 
             let currentPrice = STANDARD_PRICE;
             let description = 'Standard Registration';
@@ -1144,7 +1144,7 @@ function getDeviceFingerprint() {
     finalFees: parseInt(document.getElementById('priceDisplay').textContent),
     discountApplied:
         document.getElementById('referralCode').value.trim() !== '' &&
-        ['Muscular26', 'BBDHN26', 'PROMO26','SPON26']
+        ['muscular26', 'bbdhn26', 'promo26','spon26','iwins26']
             .includes(document.getElementById('referralCode').value.trim().toLowerCase())
             ? (STANDARD_PRICE - DISCOUNTED_PRICE)
             : 0,
@@ -1301,6 +1301,7 @@ accuracy: location?.accuracy ?? null,
     </script>
 </body>
 </html>
+
 
 
 
