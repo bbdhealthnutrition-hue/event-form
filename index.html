@@ -1144,7 +1144,7 @@ function getDeviceFingerprint() {
     finalFees: parseInt(document.getElementById('priceDisplay').textContent),
     discountApplied:
         document.getElementById('referralCode').value.trim() !== '' &&
-        ['monkey gym', 'bbd dairy', 'bankey bihari']
+        ['Muscular26', 'BBDHN26', 'PROMO26','SPON26']
             .includes(document.getElementById('referralCode').value.trim().toLowerCase())
             ? (STANDARD_PRICE - DISCOUNTED_PRICE)
             : 0,
@@ -1301,5 +1301,6 @@ accuracy: location?.accuracy ?? null,
     </script>
 </body>
 </html>
+
 
 
