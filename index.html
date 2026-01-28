@@ -1036,7 +1036,7 @@ function getDeviceFingerprint() {
             } else {
                 console.warn('[v0] ❌ referralCode element not found');
             }
-
+updatePriceAndDescription();
             // Payment Screenshot File Upload Listener
             const paymentScreenshotEl = document.getElementById('paymentScreenshot');
             if (paymentScreenshotEl) {
@@ -1301,6 +1301,7 @@ accuracy: location?.accuracy ?? null,
     </script>
 </body>
 </html>
+
 
 
 
