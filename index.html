@@ -374,8 +374,8 @@ input.error {
 
             <!-- Price Section -->
             <div class="price-section">
-                <p style="font-size: 0.85em; color: rgba(255,255,255,0.8);">Registration Fee</p>
-                <div class="price-display">₹<span id="priceDisplay">199</span></div>
+                <p style="font-size: 0.85em; color: rgba(255,255,255,0.8);">Hurry Up! Late Registration Fee</p>
+                <div class="price-display">₹<span id="priceDisplay">299</span></div>
                 <p id="priceNote" style="color: var(--primary); font-size: 0.85em;"></p>
             </div>
 
@@ -386,7 +386,7 @@ input.error {
                 <div class="payment-box">
 
     <p><strong>Participant:</strong> <span id="paymentParticipantName">--</span></p>
-    <p><strong>Amount:</strong> ₹<span id="paymentAmount">199</span></p>
+    <p><strong>Amount:</strong> ₹<span id="paymentAmount">299</span></p>
 
     <hr>
 
@@ -623,7 +623,7 @@ input.error {
         };
 
         const DEADLIFT_MIN_WEIGHT = 80;
-        const STANDARD_PRICE = 199;
+        const STANDARD_PRICE = 299;
         const DISCOUNTED_PRICE = 159;
 
         function showError(element, message) {
@@ -1104,14 +1104,14 @@ updatePriceAndDescription();
                 showToast('Location captured!', 'success');
 
                 console.log('[v0] STEP 5: Starting device fingerprint capture');
-                showToast('Capturing device fingerprint...', 'fingerprint');
+              
                 const fingerprint = await getDeviceFingerprint();
                 console.log('[v0] STEP 5.1: Device fingerprint captured:', JSON.stringify(fingerprint, null, 2));
-                showToast('Device fingerprint captured successfully!', 'success');
+                
 
                 const participantID = generateParticipantID();
                 console.log('[v0] STEP 6: Participant ID generated:', participantID);
-                showToast('Participant ID generated: ' + participantID, 'info');
+               
 
                 const screenshotFile = document.getElementById('paymentScreenshot').files[0];
                 console.log('[v0] STEP 7: Screenshot file selected:', screenshotFile ? screenshotFile.name : 'No file');
@@ -1301,6 +1301,7 @@ accuracy: location?.accuracy ?? null,
     </script>
 </body>
 </html>
+
 
 
 
